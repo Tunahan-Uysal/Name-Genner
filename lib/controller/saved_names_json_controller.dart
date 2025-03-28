@@ -41,8 +41,7 @@ class SavedNamesJsonController {
     await _initialization;
     try {
       if (!await _file.exists()) {
-        await _file.create();
-        await _file.writeAsString('[]'); // Initialize with an empty array
+        await _createNewJsonFile();
       }
 
       String contents = await _file.readAsString();
@@ -52,6 +51,32 @@ class SavedNamesJsonController {
       _log.e('Error reading or decoding JSON: $e');
       return [];
     }
+  }
+
+  /// Returns a string from the JSON file by its index.
+  ///
+  /// Used in the app for accessing a specific saved name.
+  Future<String?> readJsonStringByIndex(int index) async {
+    await _initialization;
+    try {
+      if (!await _file.exists()) {
+        await _createNewJsonFile();
+      }
+
+      String contents = await _file.readAsString();
+      List<dynamic> jsonData = jsonDecode(contents);
+      if (index >= 0 && index < jsonData.length) {
+        return jsonData[index].toString();
+      }
+    } catch (e) {
+      if (e is FileSystemException || e is PathNotFoundException) { // Re-throw FileSystemException
+        rethrow;
+      } else {
+        _log.e('Error reading or decoding JSON: $e');
+        return null; // Or consider throwing a different exception
+      }
+    }
+    return null;
   }
 
   /// Adds a string to the JSON file.

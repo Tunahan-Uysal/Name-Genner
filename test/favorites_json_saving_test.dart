@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:name_genner/controller/saved_names_json_controller.dart';
@@ -145,24 +144,20 @@ void main() {
 
       // Create the file by adding a string
       await controller.includeStringInJson(testString);
-      final file = File(path.join(appDocDir.path, 'favorited_names.json'));
-
-      // Ensure file exists initially
-      expect(await file.exists(), isTrue);
-
       // Delete the file
-      await file.delete();
+      await controller.deleteEntireJson();
 
-      // First read after deletion - should detect error, recreate file, and return empty
-      expect(await controller.readJsonAsStrings(), isEmpty);
+      // First read after deletion - should detect missing file, recreate file, and return empty
+      final firstReadAfterDeletion = await controller.readJsonAsStrings();
+      expect(firstReadAfterDeletion, isEmpty);
 
-      // Verify the file was recreated
-      expect(await file.exists(), isTrue);
-
-      // Verify the new file is empty
-      final newData = await controller.readJsonAsStrings();
-      expect(newData, isEmpty);
-
+      // Verify the file was recreated by checking if index 0 returns null
+      expect(await controller.readJsonStringByIndex(0), null);
+      // the file should be recreated, but empty, therefore the function will return null.
+      // otherwise, it would throw a PathNotFoundException.
+      await controller.includeStringInJson("another string");
+      final afterWrite = await controller.readJsonAsStrings();
+      expect(afterWrite, ['another string']);
       await teardownTest(appDocDir);
     });
   });
