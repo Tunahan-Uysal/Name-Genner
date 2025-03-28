@@ -1,4 +1,4 @@
-# my_first_app
+# name_genner
 
 A new Flutter project.
 
