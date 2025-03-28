@@ -8,8 +8,6 @@ class NameGeneratorPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var wordPair = appState.current;
-    var theme = Theme.of(context);
-
     IconData icon;
     if (appState.favorites.contains(wordPair)) {
       icon = Icons.favorite;
